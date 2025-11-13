@@ -1,0 +1,246 @@
+version: '3.8'
+
+# =====================================================
+# LeadFlow System - Docker Compose
+# SIMPLIFIED - Caddy Reverse Proxy (No Traefik)
+# Domain: leadsflowsys.online
+# VPS IP: 75.119.156.73
+# =====================================================
+
+networks:
+  leadflow-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  postgres_data:
+    driver: local
+  mautic_data:
+    driver: local
+  n8n_data:
+    driver: local
+  metabase_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+  qdrant_data:
+    driver: local
+  waha_data:
+    driver: local
+  redis_data:
+    driver: local
+  caddy_data:
+    driver: local
+
+services:
+  # =====================================================
+  # Caddy - Reverse Proxy with Auto SSL
+  # =====================================================
+  caddy:
+    image: caddy:latest
+    container_name: leadflow-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+    networks:
+      - leadflow-network
+    environment:
+      DOMAIN: leadsflowsys.online
+      ACME_EMAIL: showsceatives@gmail.com
+
+  # =====================================================
+  # PostgreSQL - Main Database
+  # =====================================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: leadflow-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "@&ae0SEKvw9AyG^*T^z3T2Cx8ZPi2Psc"
+      POSTGRES_DB: leadflow
+      POSTGRES_MAX_CONNECTIONS: "200"
+      POSTGRES_SHARED_BUFFERS: "256MB"
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql
+    networks:
+      - leadflow-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d leadflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command:
+      - "postgres"
+      - "-c"
+      - "max_connections=200"
+      - "-c"
+      - "shared_buffers=256MB"
+
+  # =====================================================
+  # Mautic - Marketing Automation
+  # =====================================================
+  mautic:
+    image: mautic/mautic:latest
+    container_name: leadflow-mautic
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      MAUTIC_DB_HOST: postgres
+      MAUTIC_DB_PORT: "5432"
+      MAUTIC_DB_NAME: mautic
+      MAUTIC_DB_USER: mauticuser
+      MAUTIC_DB_PASSWORD: "IqLX0Igz7d4LWwmWR&vWYZ3y"
+      MAUTIC_ADMIN_USERNAME: admin
+      MAUTIC_ADMIN_PASSWORD: "r$SqQ28prGc$W*IH"
+      MAUTIC_ADMIN_EMAIL: showsceatives@gmail.com
+      MAUTIC_TRUSTED_HOSTS: "mautic.leadsflowsys.online"
+      MAUTIC_TRUSTED_PROXIES: "172.20.0.0/16"
+      PHP_MEMORY_LIMIT: 512M
+      PHP_MAX_EXECUTION_TIME: "300"
+    volumes:
+      - mautic_data:/var/www/html
+    networks:
+      - leadflow-network
+
+  # =====================================================
+  # n8n - Workflow Automation
+  # =====================================================
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: leadflow-n8n
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_PORT: "5432"
+      DB_POSTGRESDB_DATABASE: n8n
+      DB_POSTGRESDB_USER: n8nuser
+      DB_POSTGRESDB_PASSWORD: "P1w&a1gmDqoWqq!O@vOSZQG$"
+      N8N_HOST: "n8n.leadsflowsys.online"
+      N8N_PROTOCOL: https
+      N8N_PORT: "5678"
+      WEBHOOK_URL: "https://n8n.leadsflowsys.online"
+      N8N_BASIC_AUTH_ACTIVE: "true"
+      N8N_BASIC_AUTH_USER: admin
+      N8N_BASIC_AUTH_PASSWORD: "Z56sDUXL3%zK*BQ%"
+      N8N_ENCRYPTION_KEY: "V$5qvDrZ*4o5YL$&k4aMUU2mUo3Z4W$J"
+      EXECUTIONS_PROCESS: main
+      EXECUTIONS_MODE: regular
+      QUEUE_BULL_REDIS_HOST: redis
+      GENERIC_TIMEZONE: Africa/Nairobi
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - leadflow-network
+
+  # =====================================================
+  # Metabase - Business Intelligence
+  # =====================================================
+  metabase:
+    image: metabase/metabase:latest
+    container_name: leadflow-metabase
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: metabase
+      MB_DB_PORT: "5432"
+      MB_DB_USER: metabaseuser
+      MB_DB_PASS: "3X8FS!F9$9v5E%rqL1@aBbVu"
+      MB_DB_HOST: postgres
+      MB_SITE_URL: "https://metabase.leadsflowsys.online"
+      JAVA_TIMEZONE: Africa/Nairobi
+    volumes:
+      - metabase_data:/metabase-data
+    networks:
+      - leadflow-network
+
+  # =====================================================
+  # RabbitMQ - Message Queue
+  # =====================================================
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: leadflow-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: mautic
+      RABBITMQ_DEFAULT_PASS: "Jx8yqP*4Z39Ky$r9iQxjB49h"
+      RABBITMQ_DEFAULT_VHOST: "/"
+      RABBITMQ_NODENAME: "rabbit@rabbitmq"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - leadflow-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =====================================================
+  # Qdrant - Vector Database
+  # =====================================================
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: leadflow-qdrant
+    restart: unless-stopped
+    environment:
+      QDRANT__SERVICE__API_KEY: "dEbkc9$qFsRIbDr$I9e38N%qA$#B6fJr"
+      QDRANT__SERVICE__HTTP_PORT: "6333"
+      QDRANT__SERVICE__GRPC_PORT: "6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - leadflow-network
+
+  # =====================================================
+  # WAHA - WhatsApp HTTP API
+  # =====================================================
+  waha:
+    image: devlikeapro/waha:latest
+    container_name: leadflow-waha
+    restart: unless-stopped
+    environment:
+      WAHA_API_KEY: "yN&4%zO6h7H!DhQ@3eJd2i!^o#^&3^e^"
+      WHATSAPP_HOOK_URL: "https://n8n.leadsflowsys.online/webhook/whatsapp"
+      WHATSAPP_DOWNLOAD_MEDIA: "TRUE"
+    volumes:
+      - waha_data:/app/.wwebjs_auth
+    networks:
+      - leadflow-network
+
+  # =====================================================
+  # Redis - Cache and Session Storage
+  # =====================================================
+  redis:
+    image: redis:7-alpine
+    container_name: leadflow-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - leadflow-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
