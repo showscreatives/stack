@@ -1,0 +1,300 @@
+version: '3.8'
+
+# =====================================================
+# LeadFlow System - Production Docker Compose
+# Domain: leadsflowsys.online
+# =====================================================
+
+networks:
+  leadflow-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  postgres_data:
+    driver: local
+  mautic_data:
+    driver: local
+  n8n_data:
+    driver: local
+  metabase_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+  qdrant_data:
+    driver: local
+  waha_data:
+    driver: local
+  traefik_certs:
+    driver: local
+
+services:
+  # =====================================================
+  # Traefik - Reverse Proxy with SSL
+  # =====================================================
+  traefik:
+    image: traefik:v2.10
+    container_name: leadflow-traefik
+    restart: unless-stopped
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.letsencrypt.acme.email=${LETSENCRYPT_EMAIL}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--log.level=${TRAEFIK_LOG_LEVEL:-INFO}"
+      - "--accesslog=true"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "traefik_certs:/letsencrypt"
+    networks:
+      - leadflow-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_SUBDOMAIN}.${DOMAIN}`)"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.middlewares=traefik-auth"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=admin:$$apr1$$8fLqZ5Wh$$D8k5lZqJvZZ5Z9Z5Z9Z5Z/"
+      # Redirect HTTP to HTTPS
+      - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.http-catchall.entrypoints=web"
+      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+  # =====================================================
+  # PostgreSQL - Main Database
+  # =====================================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: leadflow-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_MAX_CONNECTIONS: ${POSTGRES_MAX_CONNECTIONS:-200}
+      POSTGRES_SHARED_BUFFERS: ${POSTGRES_SHARED_BUFFERS:-256MB}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql
+    networks:
+      - leadflow-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command:
+      - "postgres"
+      - "-c"
+      - "max_connections=${POSTGRES_MAX_CONNECTIONS:-200}"
+      - "-c"
+      - "shared_buffers=${POSTGRES_SHARED_BUFFERS:-256MB}"
+
+  # =====================================================
+  # Mautic - Marketing Automation
+  # =====================================================
+  mautic:
+    image: mautic/mautic:latest
+    container_name: leadflow-mautic
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      MAUTIC_DB_HOST: ${MAUTIC_DB_HOST}
+      MAUTIC_DB_PORT: ${MAUTIC_DB_PORT}
+      MAUTIC_DB_NAME: ${MAUTIC_DB_NAME}
+      MAUTIC_DB_USER: ${MAUTIC_DB_USER}
+      MAUTIC_DB_PASSWORD: ${MAUTIC_DB_PASSWORD}
+      MAUTIC_ADMIN_USERNAME: ${MAUTIC_ADMIN_USERNAME}
+      MAUTIC_ADMIN_PASSWORD: ${MAUTIC_ADMIN_PASSWORD}
+      MAUTIC_ADMIN_EMAIL: ${MAUTIC_ADMIN_EMAIL}
+      MAUTIC_TRUSTED_HOSTS: ${MAUTIC_TRUSTED_HOSTS}
+      MAUTIC_TRUSTED_PROXIES: ${MAUTIC_TRUSTED_PROXIES}
+      PHP_MEMORY_LIMIT: 512M
+      PHP_MAX_EXECUTION_TIME: 300
+    volumes:
+      - mautic_data:/var/www/html
+    networks:
+      - leadflow-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mautic.rule=Host(`${MAUTIC_SUBDOMAIN}.${DOMAIN}`)"
+      - "traefik.http.routers.mautic.entrypoints=websecure"
+      - "traefik.http.routers.mautic.tls.certresolver=letsencrypt"
+      - "traefik.http.services.mautic.loadbalancer.server.port=80"
+
+  # =====================================================
+  # n8n - Workflow Automation
+  # =====================================================
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: leadflow-n8n
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_TYPE: ${DB_TYPE}
+      DB_POSTGRESDB_HOST: ${DB_POSTGRESDB_HOST}
+      DB_POSTGRESDB_PORT: ${DB_POSTGRESDB_PORT}
+      DB_POSTGRESDB_DATABASE: ${DB_POSTGRESDB_DATABASE}
+      DB_POSTGRESDB_USER: ${DB_POSTGRESDB_USER}
+      DB_POSTGRESDB_PASSWORD: ${DB_POSTGRESDB_PASSWORD}
+      N8N_HOST: ${N8N_HOST}
+      N8N_PROTOCOL: ${N8N_PROTOCOL}
+      N8N_PORT: ${N8N_PORT}
+      WEBHOOK_URL: https://${N8N_HOST}
+      N8N_BASIC_AUTH_ACTIVE: ${N8N_BASIC_AUTH_ACTIVE}
+      N8N_BASIC_AUTH_USER: ${N8N_BASIC_AUTH_USER}
+      N8N_BASIC_AUTH_PASSWORD: ${N8N_BASIC_AUTH_PASSWORD}
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
+      EXECUTIONS_PROCESS: main
+      EXECUTIONS_MODE: regular
+      QUEUE_BULL_REDIS_HOST: redis
+      GENERIC_TIMEZONE: ${TZ}
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - leadflow-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.n8n.rule=Host(`${N8N_SUBDOMAIN}.${DOMAIN}`)"
+      - "traefik.http.routers.n8n.entrypoints=websecure"
+      - "traefik.http.routers.n8n.tls.certresolver=letsencrypt"
+      - "traefik.http.services.n8n.loadbalancer.server.port=5678"
+
+  # =====================================================
+  # Metabase - Business Intelligence
+  # =====================================================
+  metabase:
+    image: metabase/metabase:latest
+    container_name: leadflow-metabase
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      MB_DB_TYPE: ${MB_DB_TYPE}
+      MB_DB_DBNAME: ${MB_DB_DBNAME}
+      MB_DB_PORT: ${MB_DB_PORT}
+      MB_DB_USER: ${MB_DB_USER}
+      MB_DB_PASS: ${MB_DB_PASS}
+      MB_DB_HOST: ${MB_DB_HOST}
+      MB_SITE_URL: ${MB_SITE_URL}
+      JAVA_TIMEZONE: ${TZ}
+    volumes:
+      - metabase_data:/metabase-data
+    networks:
+      - leadflow-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.metabase.rule=Host(`${METABASE_SUBDOMAIN}.${DOMAIN}`)"
+      - "traefik.http.routers.metabase.entrypoints=websecure"
+      - "traefik.http.routers.metabase.tls.certresolver=letsencrypt"
+      - "traefik.http.services.metabase.loadbalancer.server.port=3000"
+
+  # =====================================================
+  # RabbitMQ - Message Queue
+  # =====================================================
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: leadflow-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_DEFAULT_VHOST}
+      RABBITMQ_NODENAME: ${RABBITMQ_NODENAME}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - leadflow-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.rabbitmq.rule=Host(`${RABBITMQ_SUBDOMAIN}.${DOMAIN}`)"
+      - "traefik.http.routers.rabbitmq.entrypoints=websecure"
+      - "traefik.http.routers.rabbitmq.tls.certresolver=letsencrypt"
+      - "traefik.http.services.rabbitmq.loadbalancer.server.port=15672"
+
+  # =====================================================
+  # Qdrant - Vector Database
+  # =====================================================
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: leadflow-qdrant
+    restart: unless-stopped
+    environment:
+      QDRANT__SERVICE__API_KEY: ${QDRANT_API_KEY}
+      QDRANT__SERVICE__HTTP_PORT: ${QDRANT_PORT}
+      QDRANT__SERVICE__GRPC_PORT: ${QDRANT_GRPC_PORT}
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - leadflow-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.qdrant.rule=Host(`${QDRANT_SUBDOMAIN}.${DOMAIN}`)"
+      - "traefik.http.routers.qdrant.entrypoints=websecure"
+      - "traefik.http.routers.qdrant.tls.certresolver=letsencrypt"
+      - "traefik.http.services.qdrant.loadbalancer.server.port=6333"
+
+  # =====================================================
+  # WAHA - WhatsApp HTTP API
+  # =====================================================
+  waha:
+    image: devlikeapro/waha:latest
+    container_name: leadflow-waha
+    restart: unless-stopped
+    environment:
+      WAHA_API_KEY: ${WAHA_API_KEY}
+      WHATSAPP_HOOK_URL: https://${N8N_HOST}/webhook/whatsapp
+      WHATSAPP_DOWNLOAD_MEDIA: "TRUE"
+    volumes:
+      - waha_data:/app/.wwebjs_auth
+    networks:
+      - leadflow-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.waha.rule=Host(`${WAHA_SUBDOMAIN}.${DOMAIN}`)"
+      - "traefik.http.routers.waha.entrypoints=websecure"
+      - "traefik.http.routers.waha.tls.certresolver=letsencrypt"
+      - "traefik.http.services.waha.loadbalancer.server.port=3000"
+
+  # =====================================================
+  # Redis - Cache and Session Storage
+  # =====================================================
+  redis:
+    image: redis:7-alpine
+    container_name: leadflow-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - ./data/redis:/data
+    networks:
+      - leadflow-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5

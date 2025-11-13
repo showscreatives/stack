@@ -1,0 +1,573 @@
+{
+  "tag_categories": {
+    "status": {
+      "description": "Tracks the current status of pitches and lead engagement",
+      "tags": [
+        {
+          "name": "pitch:generated",
+          "description": "AI pitch has been created",
+          "auto_apply": "When pitch_status = 'generated'",
+          "color": "#3498db"
+        },
+        {
+          "name": "pitch:queued",
+          "description": "Pitch is queued and ready to send",
+          "auto_apply": "When pitch_status = 'queued'",
+          "color": "#9b59b6"
+        },
+        {
+          "name": "pitch:sent",
+          "description": "Email has been delivered",
+          "auto_apply": "When pitch_status = 'sent'",
+          "color": "#2ecc71"
+        },
+        {
+          "name": "pitch:opened",
+          "description": "Recipient opened the email",
+          "auto_apply": "On email open event",
+          "color": "#f39c12"
+        },
+        {
+          "name": "pitch:clicked",
+          "description": "Recipient clicked CTA link",
+          "auto_apply": "On email click event",
+          "color": "#e67e22"
+        },
+        {
+          "name": "pitch:replied",
+          "description": "Recipient responded to email",
+          "auto_apply": "Manual or via reply detection",
+          "color": "#27ae60"
+        },
+        {
+          "name": "pitch:converted",
+          "description": "Lead booked meeting/demo",
+          "auto_apply": "Manual or via conversion tracking",
+          "color": "#16a085"
+        },
+        {
+          "name": "pitch:failed",
+          "description": "Delivery or generation failed",
+          "auto_apply": "When pitch_status = 'failed'",
+          "color": "#e74c3c"
+        },
+        {
+          "name": "pitch:bounced",
+          "description": "Email bounced",
+          "auto_apply": "On bounce event",
+          "color": "#c0392b"
+        }
+      ]
+    },
+    "engagement": {
+      "description": "Categorizes leads by their engagement level",
+      "tags": [
+        {
+          "name": "engagement:cold",
+          "description": "No prior interaction",
+          "auto_apply": "When engagement_score < 20",
+          "color": "#95a5a6"
+        },
+        {
+          "name": "engagement:warm",
+          "description": "Some past engagement",
+          "auto_apply": "When engagement_score between 20-60",
+          "color": "#f39c12"
+        },
+        {
+          "name": "engagement:hot",
+          "description": "High engagement score",
+          "auto_apply": "When engagement_score > 60",
+          "color": "#e74c3c"
+        },
+        {
+          "name": "engagement:re-engage",
+          "description": "Previously engaged, now dormant",
+          "auto_apply": "Manual - based on inactivity analysis",
+          "color": "#9b59b6"
+        },
+        {
+          "name": "engagement:active",
+          "description": "Currently engaging with content",
+          "auto_apply": "Recent opens/clicks in last 7 days",
+          "color": "#27ae60"
+        }
+      ]
+    },
+    "pitch_type": {
+      "description": "Identifies the type of pitch sent",
+      "tags": [
+        {
+          "name": "pitch-type:first-contact",
+          "description": "First pitch to the contact",
+          "auto_apply": "When pitch_sequence_number = 1",
+          "color": "#3498db"
+        },
+        {
+          "name": "pitch-type:follow-up",
+          "description": "Follow-up pitch",
+          "auto_apply": "When pitch_sequence_number > 1",
+          "color": "#9b59b6"
+        },
+        {
+          "name": "pitch-type:social-triggered",
+          "description": "Generated from social insights",
+          "auto_apply": "When triggered by social activity",
+          "color": "#1abc9c"
+        },
+        {
+          "name": "pitch-type:behavioral",
+          "description": "Based on website behavior",
+          "auto_apply": "When triggered by website actions",
+          "color": "#f39c12"
+        },
+        {
+          "name": "pitch-type:event-based",
+          "description": "Triggered by specific event",
+          "auto_apply": "When triggered by company event/news",
+          "color": "#e67e22"
+        },
+        {
+          "name": "pitch-type:reactivation",
+          "description": "Re-engagement campaign",
+          "auto_apply": "For dormant contacts",
+          "color": "#c0392b"
+        },
+        {
+          "name": "pitch-type:welcome",
+          "description": "Welcome/onboarding email",
+          "auto_apply": "For new subscribers",
+          "color": "#27ae60"
+        }
+      ]
+    },
+    "ai_model": {
+      "description": "Tracks which AI model generated the pitch",
+      "tags": [
+        {
+          "name": "ai:gpt4-turbo",
+          "description": "GPT-4 Turbo model",
+          "auto_apply": "When pitch_version contains 'gpt-4-turbo'",
+          "color": "#16a085"
+        },
+        {
+          "name": "ai:gpt4",
+          "description": "GPT-4 model",
+          "auto_apply": "When pitch_version contains 'gpt-4'",
+          "color": "#27ae60"
+        },
+        {
+          "name": "ai:claude-3-opus",
+          "description": "Claude 3 Opus model",
+          "auto_apply": "When pitch_version contains 'claude-3-opus'",
+          "color": "#9b59b6"
+        },
+        {
+          "name": "ai:claude-3-sonnet",
+          "description": "Claude 3 Sonnet model",
+          "auto_apply": "When pitch_version contains 'claude-3-sonnet'",
+          "color": "#8e44ad"
+        },
+        {
+          "name": "ai:custom-model",
+          "description": "Custom trained model",
+          "auto_apply": "When pitch_version contains 'custom'",
+          "color": "#34495e"
+        }
+      ]
+    },
+    "source": {
+      "description": "Identifies where the lead came from",
+      "tags": [
+        {
+          "name": "source:linkedin",
+          "description": "From LinkedIn",
+          "auto_apply": "When source_channel = 'linkedin'",
+          "color": "#0077b5"
+        },
+        {
+          "name": "source:google-maps",
+          "description": "From Google Maps scraping",
+          "auto_apply": "When source_channel = 'google_maps'",
+          "color": "#4285f4"
+        },
+        {
+          "name": "source:website-form",
+          "description": "Website form submission",
+          "auto_apply": "When source_channel = 'website_form'",
+          "color": "#2ecc71"
+        },
+        {
+          "name": "source:referral",
+          "description": "Referred by existing contact",
+          "auto_apply": "When source_channel = 'referral'",
+          "color": "#e67e22"
+        },
+        {
+          "name": "source:event",
+          "description": "From event or conference",
+          "auto_apply": "When source_channel = 'event'",
+          "color": "#9b59b6"
+        },
+        {
+          "name": "source:api",
+          "description": "Added via API integration",
+          "auto_apply": "When source_channel = 'api'",
+          "color": "#34495e"
+        },
+        {
+          "name": "source:manual",
+          "description": "Manually entered",
+          "auto_apply": "When source_channel = 'manual'",
+          "color": "#95a5a6"
+        }
+      ]
+    },
+    "industry": {
+      "description": "Industry vertical tags",
+      "tags": [
+        {
+          "name": "industry:tech",
+          "description": "Technology sector",
+          "auto_apply": "When industry = 'tech'",
+          "color": "#3498db"
+        },
+        {
+          "name": "industry:finance",
+          "description": "Financial services",
+          "auto_apply": "When industry = 'finance'",
+          "color": "#16a085"
+        },
+        {
+          "name": "industry:healthcare",
+          "description": "Healthcare and medical",
+          "auto_apply": "When industry = 'healthcare'",
+          "color": "#e74c3c"
+        },
+        {
+          "name": "industry:retail",
+          "description": "Retail & E-commerce",
+          "auto_apply": "When industry = 'retail'",
+          "color": "#f39c12"
+        },
+        {
+          "name": "industry:manufacturing",
+          "description": "Manufacturing",
+          "auto_apply": "When industry = 'manufacturing'",
+          "color": "#95a5a6"
+        },
+        {
+          "name": "industry:education",
+          "description": "Education sector",
+          "auto_apply": "When industry = 'education'",
+          "color": "#9b59b6"
+        },
+        {
+          "name": "industry:real-estate",
+          "description": "Real estate",
+          "auto_apply": "When industry = 'real_estate'",
+          "color": "#27ae60"
+        },
+        {
+          "name": "industry:services",
+          "description": "Professional services",
+          "auto_apply": "When industry = 'professional_services'",
+          "color": "#34495e"
+        }
+      ]
+    },
+    "lifecycle": {
+      "description": "Lead lifecycle stage tags",
+      "tags": [
+        {
+          "name": "stage:subscriber",
+          "description": "Email subscriber",
+          "auto_apply": "When lifecycle_stage = 'subscriber'",
+          "color": "#95a5a6"
+        },
+        {
+          "name": "stage:lead",
+          "description": "Identified lead",
+          "auto_apply": "When lifecycle_stage = 'lead'",
+          "color": "#3498db"
+        },
+        {
+          "name": "stage:mql",
+          "description": "Marketing qualified lead",
+          "auto_apply": "When lifecycle_stage = 'mql'",
+          "color": "#f39c12"
+        },
+        {
+          "name": "stage:sql",
+          "description": "Sales qualified lead",
+          "auto_apply": "When lifecycle_stage = 'sql'",
+          "color": "#e67e22"
+        },
+        {
+          "name": "stage:opportunity",
+          "description": "Active opportunity",
+          "auto_apply": "When lifecycle_stage = 'opportunity'",
+          "color": "#e74c3c"
+        },
+        {
+          "name": "stage:customer",
+          "description": "Paying customer",
+          "auto_apply": "When lifecycle_stage = 'customer'",
+          "color": "#27ae60"
+        },
+        {
+          "name": "stage:evangelist",
+          "description": "Brand advocate",
+          "auto_apply": "When lifecycle_stage = 'evangelist'",
+          "color": "#16a085"
+        }
+      ]
+    },
+    "company_size": {
+      "description": "Company size categorization",
+      "tags": [
+        {
+          "name": "size:startup",
+          "description": "Startup (1-50 employees)",
+          "auto_apply": "When company_size IN ('1-10', '11-50')",
+          "color": "#3498db"
+        },
+        {
+          "name": "size:smb",
+          "description": "Small-Medium Business (51-500)",
+          "auto_apply": "When company_size IN ('51-200', '201-500')",
+          "color": "#f39c12"
+        },
+        {
+          "name": "size:midmarket",
+          "description": "Mid-market (501-5000)",
+          "auto_apply": "When company_size IN ('501-1000', '1001-5000')",
+          "color": "#e67e22"
+        },
+        {
+          "name": "size:enterprise",
+          "description": "Enterprise (5000+)",
+          "auto_apply": "When company_size = '5000+'",
+          "color": "#c0392b"
+        }
+      ]
+    },
+    "qualification": {
+      "description": "Lead qualification status",
+      "tags": [
+        {
+          "name": "qual:new",
+          "description": "New uncontacted lead",
+          "auto_apply": "When qualification_status = 'new'",
+          "color": "#95a5a6"
+        },
+        {
+          "name": "qual:attempting",
+          "description": "Attempting to contact",
+          "auto_apply": "When qualification_status = 'attempting_contact'",
+          "color": "#3498db"
+        },
+        {
+          "name": "qual:contacted",
+          "description": "Successfully contacted",
+          "auto_apply": "When qualification_status = 'contacted'",
+          "color": "#f39c12"
+        },
+        {
+          "name": "qual:qualified",
+          "description": "Qualified lead",
+          "auto_apply": "When qualification_status = 'qualified'",
+          "color": "#27ae60"
+        },
+        {
+          "name": "qual:unqualified",
+          "description": "Unqualified/not a fit",
+          "auto_apply": "When qualification_status = 'unqualified'",
+          "color": "#e74c3c"
+        },
+        {
+          "name": "qual:customer",
+          "description": "Converted to customer",
+          "auto_apply": "When qualification_status = 'customer'",
+          "color": "#16a085"
+        },
+        {
+          "name": "qual:lost",
+          "description": "Lost opportunity",
+          "auto_apply": "When qualification_status = 'lost'",
+          "color": "#c0392b"
+        }
+      ]
+    },
+    "behavior": {
+      "description": "Behavioral tags based on actions",
+      "tags": [
+        {
+          "name": "behavior:email-engaged",
+          "description": "Actively engages with emails",
+          "auto_apply": "Multiple opens/clicks in last 30 days",
+          "color": "#27ae60"
+        },
+        {
+          "name": "behavior:website-visitor",
+          "description": "Visited website recently",
+          "auto_apply": "Website visit in last 7 days",
+          "color": "#3498db"
+        },
+        {
+          "name": "behavior:content-downloader",
+          "description": "Downloaded content/resources",
+          "auto_apply": "Downloaded whitepaper/ebook",
+          "color": "#9b59b6"
+        },
+        {
+          "name": "behavior:event-attendee",
+          "description": "Attended webinar/event",
+          "auto_apply": "Registered for or attended event",
+          "color": "#e67e22"
+        },
+        {
+          "name": "behavior:unresponsive",
+          "description": "Not responding to outreach",
+          "auto_apply": "No engagement in 60+ days",
+          "color": "#95a5a6"
+        }
+      ]
+    },
+    "pain_point": {
+      "description": "Detected pain points",
+      "tags": [
+        {
+          "name": "pain:scalability",
+          "description": "Scaling challenges",
+          "auto_apply": "Manual based on pain_points field",
+          "color": "#e74c3c"
+        },
+        {
+          "name": "pain:cost",
+          "description": "Cost concerns",
+          "auto_apply": "Manual based on budget_signals",
+          "color": "#f39c12"
+        },
+        {
+          "name": "pain:efficiency",
+          "description": "Efficiency/productivity issues",
+          "auto_apply": "Manual based on expressed_needs",
+          "color": "#3498db"
+        },
+        {
+          "name": "pain:integration",
+          "description": "Integration challenges",
+          "auto_apply": "Manual based on pain_points field",
+          "color": "#9b59b6"
+        },
+        {
+          "name": "pain:technology",
+          "description": "Technology limitations",
+          "auto_apply": "Manual based on pain_points field",
+          "color": "#34495e"
+        }
+      ]
+    },
+    "campaign_response": {
+      "description": "Campaign response tracking",
+      "tags": [
+        {
+          "name": "response:quick",
+          "description": "Responded within 24 hours",
+          "auto_apply": "Reply within 24 hours of send",
+          "color": "#27ae60"
+        },
+        {
+          "name": "response:delayed",
+          "description": "Responded after 3+ days",
+          "auto_apply": "Reply after 72+ hours",
+          "color": "#f39c12"
+        },
+        {
+          "name": "response:meeting-booked",
+          "description": "Booked a meeting",
+          "auto_apply": "Manual or via calendar integration",
+          "color": "#16a085"
+        },
+        {
+          "name": "response:asked-questions",
+          "description": "Asked follow-up questions",
+          "auto_apply": "Manual based on reply content",
+          "color": "#3498db"
+        },
+        {
+          "name": "response:not-interested",
+          "description": "Indicated not interested",
+          "auto_apply": "Manual based on reply content",
+          "color": "#e74c3c"
+        }
+      ]
+    }
+  },
+  "automation_rules": {
+    "tag_cleanup": {
+      "description": "Rules for removing outdated tags",
+      "rules": [
+        {
+          "remove": "engagement:cold",
+          "when": "engagement_score > 20"
+        },
+        {
+          "remove": "engagement:warm",
+          "when": "engagement_score < 20 OR engagement_score > 60"
+        },
+        {
+          "remove": "engagement:hot",
+          "when": "engagement_score < 60"
+        },
+        {
+          "remove": "pitch:generated",
+          "when": "pitch_status != 'generated'"
+        },
+        {
+          "remove": "pitch:queued",
+          "when": "pitch_status != 'queued'"
+        }
+      ]
+    },
+    "tag_progression": {
+      "description": "Tags that should be updated as status progresses",
+      "progressions": [
+        {
+          "from": "pitch:sent",
+          "to": "pitch:opened",
+          "trigger": "email_open_event"
+        },
+        {
+          "from": "pitch:opened",
+          "to": "pitch:clicked",
+          "trigger": "email_click_event"
+        },
+        {
+          "from": "pitch:clicked",
+          "to": "pitch:replied",
+          "trigger": "email_reply_detected"
+        },
+        {
+          "from": "pitch:replied",
+          "to": "pitch:converted",
+          "trigger": "meeting_booked"
+        }
+      ]
+    }
+  },
+  "implementation_notes": {
+    "api_endpoint": "/api/tags/new",
+    "bulk_application": "/api/contacts/{id}/tags/add",
+    "automation_via": "Campaigns > Decisions > Contact Tag",
+    "tag_limit": "No hard limit, but keep organized",
+    "best_practices": [
+      "Use consistent naming convention (category:value)",
+      "Apply colors for visual differentiation",
+      "Document auto-apply logic",
+      "Regular cleanup of unused tags",
+      "Use segments for complex queries, tags for simple categorization"
+    ]
+  }
+}

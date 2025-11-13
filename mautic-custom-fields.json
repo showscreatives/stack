@@ -1,0 +1,675 @@
+{
+  "custom_fields": [
+    {
+      "alias": "ai_pitch",
+      "label": "AI Generated Pitch",
+      "type": "textarea",
+      "group": "Core",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": true,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 1,
+      "properties": {
+        "rows": 10
+      },
+      "description": "Store the personalized AI-generated pitch content"
+    },
+    {
+      "alias": "pitch_subject_line",
+      "label": "Pitch Subject Line",
+      "type": "text",
+      "group": "Core",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": true,
+      "isListable": true,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 2,
+      "properties": {
+        "maxLength": 255
+      },
+      "description": "Email subject line for the pitch"
+    },
+    {
+      "alias": "pitch_soft_cta",
+      "label": "Pitch Soft CTA",
+      "type": "text",
+      "group": "Core",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": false,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 3,
+      "properties": {
+        "maxLength": 255
+      },
+      "description": "Call-to-action used in the pitch"
+    },
+    {
+      "alias": "pitch_version",
+      "label": "Pitch Version",
+      "type": "text",
+      "group": "Core",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": true,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 4,
+      "properties": {
+        "maxLength": 50
+      },
+      "description": "AI model version that generated the pitch"
+    },
+    {
+      "alias": "pitch_generated_at",
+      "label": "Pitch Generated Date",
+      "type": "datetime",
+      "group": "Core",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": true,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 5,
+      "properties": {},
+      "description": "Timestamp when pitch was generated"
+    },
+    {
+      "alias": "pitch_sent_at",
+      "label": "Pitch Sent Date",
+      "type": "datetime",
+      "group": "Core",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": true,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 6,
+      "properties": {},
+      "description": "When email was actually sent"
+    },
+    {
+      "alias": "pitch_status",
+      "label": "Pitch Status",
+      "type": "select",
+      "group": "Core",
+      "defaultValue": "pending",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": true,
+      "isListable": true,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 7,
+      "properties": {
+        "list": [
+          {"label": "Pending", "value": "pending"},
+          {"label": "Generated", "value": "generated"},
+          {"label": "Queued", "value": "queued"},
+          {"label": "Sending", "value": "sending"},
+          {"label": "Sent", "value": "sent"},
+          {"label": "Opened", "value": "opened"},
+          {"label": "Clicked", "value": "clicked"},
+          {"label": "Replied", "value": "replied"},
+          {"label": "Converted", "value": "converted"},
+          {"label": "Bounced", "value": "bounced"},
+          {"label": "Failed", "value": "failed"}
+        ]
+      },
+      "description": "Current status of the pitch"
+    },
+    {
+      "alias": "linkedin_url",
+      "label": "LinkedIn Profile URL",
+      "type": "url",
+      "group": "Social",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": true,
+      "isPubliclyUpdatable": true,
+      "isUniqueIdentifer": false,
+      "order": 10,
+      "properties": {},
+      "description": "LinkedIn profile URL for social insights"
+    },
+    {
+      "alias": "twitter_handle",
+      "label": "Twitter/X Handle",
+      "type": "text",
+      "group": "Social",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": false,
+      "isPubliclyUpdatable": true,
+      "isUniqueIdentifer": false,
+      "order": 11,
+      "properties": {
+        "maxLength": 100
+      },
+      "description": "Twitter/X username"
+    },
+    {
+      "alias": "social_activity",
+      "label": "Recent Social Activity",
+      "type": "textarea",
+      "group": "Social",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": false,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 12,
+      "properties": {
+        "rows": 5
+      },
+      "description": "Summary of latest posts and engagements"
+    },
+    {
+      "alias": "content_themes",
+      "label": "Content Themes",
+      "type": "multiselect",
+      "group": "Social",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": false,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 13,
+      "properties": {
+        "list": [
+          {"label": "Technology", "value": "technology"},
+          {"label": "Marketing", "value": "marketing"},
+          {"label": "Sales", "value": "sales"},
+          {"label": "Leadership", "value": "leadership"},
+          {"label": "Innovation", "value": "innovation"},
+          {"label": "AI/ML", "value": "ai_ml"},
+          {"label": "Data", "value": "data"},
+          {"label": "Business Growth", "value": "business_growth"},
+          {"label": "Customer Success", "value": "customer_success"},
+          {"label": "Product Development", "value": "product_dev"}
+        ]
+      },
+      "description": "Topics the contact engages with"
+    },
+    {
+      "alias": "industry",
+      "label": "Industry Vertical",
+      "type": "select",
+      "group": "Company",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": true,
+      "isListable": true,
+      "isPubliclyUpdatable": true,
+      "isUniqueIdentifer": false,
+      "order": 20,
+      "properties": {
+        "list": [
+          {"label": "Technology", "value": "tech"},
+          {"label": "Finance", "value": "finance"},
+          {"label": "Healthcare", "value": "healthcare"},
+          {"label": "Retail & E-commerce", "value": "retail"},
+          {"label": "Manufacturing", "value": "manufacturing"},
+          {"label": "Education", "value": "education"},
+          {"label": "Real Estate", "value": "real_estate"},
+          {"label": "Professional Services", "value": "professional_services"},
+          {"label": "Media & Entertainment", "value": "media"},
+          {"label": "Other", "value": "other"}
+        ]
+      },
+      "description": "Industry sector of the contact's company"
+    },
+    {
+      "alias": "company_size",
+      "label": "Company Size",
+      "type": "select",
+      "group": "Company",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": true,
+      "isListable": true,
+      "isPubliclyUpdatable": true,
+      "isUniqueIdentifer": false,
+      "order": 21,
+      "properties": {
+        "list": [
+          {"label": "1-10 employees", "value": "1-10"},
+          {"label": "11-50 employees", "value": "11-50"},
+          {"label": "51-200 employees", "value": "51-200"},
+          {"label": "201-500 employees", "value": "201-500"},
+          {"label": "501-1000 employees", "value": "501-1000"},
+          {"label": "1001-5000 employees", "value": "1001-5000"},
+          {"label": "5000+ employees", "value": "5000+"}
+        ]
+      },
+      "description": "Number of employees in the company"
+    },
+    {
+      "alias": "company_website",
+      "label": "Company Website",
+      "type": "url",
+      "group": "Company",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": true,
+      "isPubliclyUpdatable": true,
+      "isUniqueIdentifer": false,
+      "order": 22,
+      "properties": {},
+      "description": "Company website URL"
+    },
+    {
+      "alias": "company_location",
+      "label": "Company Location",
+      "type": "text",
+      "group": "Company",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": true,
+      "isPubliclyUpdatable": true,
+      "isUniqueIdentifer": false,
+      "order": 23,
+      "properties": {
+        "maxLength": 255
+      },
+      "description": "Company headquarters location"
+    },
+    {
+      "alias": "engagement_score",
+      "label": "Engagement Score",
+      "type": "number",
+      "group": "Scoring",
+      "defaultValue": "0",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": true,
+      "isListable": true,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 30,
+      "properties": {
+        "roundMode": "0",
+        "precision": "0"
+      },
+      "description": "Calculated engagement score (0-100)"
+    },
+    {
+      "alias": "lead_score_custom",
+      "label": "Custom Lead Score",
+      "type": "number",
+      "group": "Scoring",
+      "defaultValue": "0",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": true,
+      "isListable": true,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 31,
+      "properties": {
+        "roundMode": "0",
+        "precision": "0"
+      },
+      "description": "Custom lead scoring metric (0-100)"
+    },
+    {
+      "alias": "qualification_status",
+      "label": "Qualification Status",
+      "type": "select",
+      "group": "Lifecycle",
+      "defaultValue": "new",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": true,
+      "isListable": true,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 35,
+      "properties": {
+        "list": [
+          {"label": "New", "value": "new"},
+          {"label": "Attempting Contact", "value": "attempting_contact"},
+          {"label": "Contacted", "value": "contacted"},
+          {"label": "Qualified", "value": "qualified"},
+          {"label": "Unqualified", "value": "unqualified"},
+          {"label": "Customer", "value": "customer"},
+          {"label": "Lost", "value": "lost"}
+        ]
+      },
+      "description": "Current qualification status"
+    },
+    {
+      "alias": "lifecycle_stage",
+      "label": "Lifecycle Stage",
+      "type": "select",
+      "group": "Lifecycle",
+      "defaultValue": "subscriber",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": true,
+      "isListable": true,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 36,
+      "properties": {
+        "list": [
+          {"label": "Subscriber", "value": "subscriber"},
+          {"label": "Lead", "value": "lead"},
+          {"label": "Marketing Qualified Lead", "value": "mql"},
+          {"label": "Sales Qualified Lead", "value": "sql"},
+          {"label": "Opportunity", "value": "opportunity"},
+          {"label": "Customer", "value": "customer"},
+          {"label": "Evangelist", "value": "evangelist"},
+          {"label": "Other", "value": "other"}
+        ]
+      },
+      "description": "Current lifecycle stage"
+    },
+    {
+      "alias": "pain_points",
+      "label": "Pain Points Detected",
+      "type": "textarea",
+      "group": "Insights",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": false,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 40,
+      "properties": {
+        "rows": 5
+      },
+      "description": "Detected challenges from social listening"
+    },
+    {
+      "alias": "expressed_needs",
+      "label": "Expressed Needs",
+      "type": "textarea",
+      "group": "Insights",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": false,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 41,
+      "properties": {
+        "rows": 3
+      },
+      "description": "Needs expressed by the contact"
+    },
+    {
+      "alias": "competitor_mentions",
+      "label": "Competitor Mentions",
+      "type": "text",
+      "group": "Insights",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": false,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 42,
+      "properties": {
+        "maxLength": 255
+      },
+      "description": "Competitors mentioned in social activity"
+    },
+    {
+      "alias": "budget_signals",
+      "label": "Budget Signals",
+      "type": "text",
+      "group": "Insights",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": false,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 43,
+      "properties": {
+        "maxLength": 255
+      },
+      "description": "Budget availability indicators"
+    },
+    {
+      "alias": "pitch_template_id",
+      "label": "Pitch Template Used",
+      "type": "text",
+      "group": "Metadata",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": false,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 50,
+      "properties": {
+        "maxLength": 50
+      },
+      "description": "Template ID used for pitch generation"
+    },
+    {
+      "alias": "prompt_hash",
+      "label": "AI Prompt Hash",
+      "type": "text",
+      "group": "Metadata",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": false,
+      "isShortVisible": false,
+      "isListable": false,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 51,
+      "properties": {
+        "maxLength": 64
+      },
+      "description": "Hash of the AI prompt configuration"
+    },
+    {
+      "alias": "cold_pitch_campaign_id",
+      "label": "Campaign ID",
+      "type": "number",
+      "group": "Campaign",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": true,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 60,
+      "properties": {
+        "roundMode": "0",
+        "precision": "0"
+      },
+      "description": "Mautic campaign ID"
+    },
+    {
+      "alias": "archive_ref_id",
+      "label": "Archive Reference ID",
+      "type": "text",
+      "group": "Core",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": true,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": true,
+      "order": 8,
+      "properties": {
+        "maxLength": 100
+      },
+      "description": "Reference ID linking to PostgreSQL archive"
+    },
+    {
+      "alias": "pitch_confidence_score",
+      "label": "Pitch Confidence Score",
+      "type": "number",
+      "group": "Metadata",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": false,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 52,
+      "properties": {
+        "roundMode": "0",
+        "precision": "0"
+      },
+      "description": "AI confidence in pitch quality (0-100)"
+    },
+    {
+      "alias": "tone_classification",
+      "label": "Tone Classification",
+      "type": "select",
+      "group": "Metadata",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": false,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 53,
+      "properties": {
+        "list": [
+          {"label": "Professional", "value": "professional"},
+          {"label": "Conversational", "value": "conversational"},
+          {"label": "Executive", "value": "executive"},
+          {"label": "Friendly", "value": "friendly"},
+          {"label": "Technical", "value": "technical"}
+        ]
+      },
+      "description": "Tone used in the pitch"
+    },
+    {
+      "alias": "last_follow_up_date",
+      "label": "Last Follow-up Date",
+      "type": "datetime",
+      "group": "Campaign",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": true,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 61,
+      "properties": {},
+      "description": "Date of last follow-up sent"
+    },
+    {
+      "alias": "next_follow_up_date",
+      "label": "Next Follow-up Date",
+      "type": "datetime",
+      "group": "Campaign",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": true,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 62,
+      "properties": {},
+      "description": "Scheduled date for next follow-up"
+    },
+    {
+      "alias": "pitch_sequence_number",
+      "label": "Pitch Sequence Number",
+      "type": "number",
+      "group": "Campaign",
+      "defaultValue": "1",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": false,
+      "isListable": true,
+      "isPubliclyUpdatable": false,
+      "isUniqueIdentifer": false,
+      "order": 63,
+      "properties": {
+        "roundMode": "0",
+        "precision": "0"
+      },
+      "description": "Number in the pitch sequence (1=first, 2=follow-up 1, etc.)"
+    },
+    {
+      "alias": "source_channel",
+      "label": "Source Channel",
+      "type": "select",
+      "group": "Source",
+      "defaultValue": "",
+      "isRequired": false,
+      "isVisible": true,
+      "isShortVisible": true,
+      "isListable": true,
+      "isPubliclyUpdatable": true,
+      "isUniqueIdentifer": false,
+      "order": 70,
+      "properties": {
+        "list": [
+          {"label": "LinkedIn", "value": "linkedin"},
+          {"label": "Google Maps", "value": "google_maps"},
+          {"label": "Website Form", "value": "website_form"},
+          {"label": "Referral", "value": "referral"},
+          {"label": "Event", "value": "event"},
+          {"label": "Cold Outreach", "value": "cold_outreach"},
+          {"label": "Social Media", "value": "social_media"},
+          {"label": "API", "value": "api"},
+          {"label": "Manual Entry", "value": "manual"},
+          {"label": "Other", "value": "other"}
+        ]
+      },
+      "description": "Channel through which lead was acquired"
+    }
+  ],
+  "installation_notes": {
+    "method": "api",
+    "endpoint": "/api/fields/contact/new",
+    "authentication": "Basic Auth or OAuth2",
+    "batch_creation": true,
+    "validation": "All fields should be validated before creation",
+    "groups_required": ["Core", "Social", "Company", "Scoring", "Lifecycle", "Insights", "Metadata", "Campaign", "Source"]
+  }
+}
