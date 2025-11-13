@@ -1,0 +1,101 @@
+# =====================================================
+# Caddy Configuration - Reverse Proxy with Auto SSL
+# Domain: leadsflowsys.online
+# =====================================================
+
+# Global settings
+{
+  email showsceatives@gmail.com
+  acme_dns cloudflare {env.CF_API_TOKEN}
+}
+
+# =====================================================
+# Mautic
+# =====================================================
+mautic.leadsflowsys.online {
+  reverse_proxy mautic:80
+  
+  # Headers for proxying
+  header X-Forwarded-For {http.request.remote}
+  header X-Forwarded-Proto {http.request.proto}
+  header X-Forwarded-Host {http.request.host}
+}
+
+# =====================================================
+# n8n
+# =====================================================
+n8n.leadsflowsys.online {
+  reverse_proxy n8n:5678
+  
+  header X-Forwarded-For {http.request.remote}
+  header X-Forwarded-Proto {http.request.proto}
+  header X-Forwarded-Host {http.request.host}
+  
+  # WebSocket support for n8n
+  @websocket {
+    header Upgrade websocket
+    header Connection upgrade
+  }
+  reverse_proxy @websocket n8n:5678
+}
+
+# =====================================================
+# Metabase
+# =====================================================
+metabase.leadsflowsys.online {
+  reverse_proxy metabase:3000
+  
+  header X-Forwarded-For {http.request.remote}
+  header X-Forwarded-Proto {http.request.proto}
+  header X-Forwarded-Host {http.request.host}
+}
+
+# =====================================================
+# RabbitMQ Management Dashboard
+# =====================================================
+rabbitmq.leadsflowsys.online {
+  reverse_proxy rabbitmq:15672
+  
+  header X-Forwarded-For {http.request.remote}
+  header X-Forwarded-Proto {http.request.proto}
+  header X-Forwarded-Host {http.request.host}
+  
+  # Basic auth (optional - already protected in RabbitMQ)
+  # basicauth * {
+  #   mautic Jx8yqP*4Z39Ky$r9iQxjB49h
+  # }
+}
+
+# =====================================================
+# Qdrant Vector Database
+# =====================================================
+qdrant.leadsflowsys.online {
+  reverse_proxy qdrant:6333
+  
+  header X-Forwarded-For {http.request.remote}
+  header X-Forwarded-Proto {http.request.proto}
+  header X-Forwarded-Host {http.request.host}
+}
+
+# =====================================================
+# WAHA WhatsApp API
+# =====================================================
+waha.leadsflowsys.online {
+  reverse_proxy waha:3000
+  
+  header X-Forwarded-For {http.request.remote}
+  header X-Forwarded-Proto {http.request.proto}
+  header X-Forwarded-Host {http.request.host}
+}
+
+# =====================================================
+# Root domain redirect to Mautic
+# =====================================================
+leadsflowsys.online {
+  redir https://mautic.leadsflowsys.online 301
+}
+
+# Wildcard catch-all
+*.leadsflowsys.online {
+  redir https://mautic.leadsflowsys.online 301
+}
